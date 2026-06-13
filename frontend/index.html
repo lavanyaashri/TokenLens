@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TokenLens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav>
+  <div class="nav-logo">Token<span class="logo-accent">Lens</span></div>
+  <div id="status-badge" class="badge badge-loading">Connecting...</div>
+  <div class="nav-links">
+    <a href="/static/about.html">How it works</a>
+    <a href="https://github.com" target="_blank">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>
+      <span class="hero-thin">Compress.</span><br>
+      <span class="hero-bold gradient-text" id="typing"></span><span class="cursor">|</span><br>
+      <span class="hero-thin">Understand.</span>
+    </h1>
+    <div class="hero-line"></div>
+    <p class="hero-sub">A research tool for the age of expensive tokens. Fully local. No API keys. No data leaves your machine.</p>
+    <a href="#app" class="hero-btn">Start compressing</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">65<span class="hero-stat-unit">%</span></div>
+      <div class="hero-stat-label">avg token reduction</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">97<span class="hero-stat-unit">%</span></div>
+      <div class="hero-stat-label">meaning preserved</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">2</div>
+      <div class="hero-stat-label">compression strategies</div>
+    </div>
+  </div>
+</section>
+
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <div class="section-label">Process</div>
+    <h2 class="section-title">Three steps.<br>Real results.</h2>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-title">Paste or upload</div>
+        <div class="step-desc">Drop in any long document. Article, paper, transcript, anything.</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-title">Choose a strategy</div>
+        <div class="step-desc">Extractive keeps the best chunks. Abstractive rewrites them shorter.</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-title">See the tradeoff</div>
+        <div class="step-desc">Tokens saved vs quality preserved, scored with ROUGE-L and semantic similarity.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="app-section" id="app">
+  <div class="section-label">Tool</div>
+  <h2 class="section-title" style="margin-bottom:2rem">Run a compression</h2>
+
+  <div class="app-grid">
+    <div class="panel" id="input-panel">
+      <div class="panel-label">Input</div>
+
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">↑</div>
+        <div class="upload-text">Drop a file here or <span class="upload-link" id="upload-trigger">browse</span></div>
+        <div class="upload-sub">Supports .txt · .pdf · .md</div>
+        <input type="file" id="file-input" accept=".txt,.pdf,.md" style="display:none"/>
+      </div>
+
+      <div class="divider-text">or paste text directly</div>
+
+      <textarea id="input-text" placeholder="Paste any long text here. Wikipedia article, research paper, news article..."></textarea>
+      <div class="word-count" id="word-count">0 words · 0 tokens</div>
+    </div>
+
+    <div class="panel" id="config-panel">
+      <div class="panel-label">Configure</div>
+
+      <label class="field-label">Your question</label>
+      <input type="text" id="question" placeholder="e.g. What is the main conclusion?" />
+
+      <label class="field-label">Strategy</label>
+      <div class="strategy-pills">
+        <button class="pill active" data-val="extractive">Extractive</button>
+        <button class="pill" data-val="abstractive">Abstractive</button>
+        <button class="pill" data-val="both">Both</button>
+      </div>
+
+      <label class="field-label">Q&A model</label>
+      <select id="qa-model"></select>
+
+      <label class="field-label">Summarization model</label>
+      <select id="sum-model"></select>
+
+      <label class="field-label">
+        Compression ratio <span class="slider-val" id="ratio-val">0.5</span>
+      </label>
+      <input type="range" id="ratio" min="0.1" max="0.9" step="0.1" value="0.5" />
+
+      <label class="field-label">
+        Chunk size <span class="slider-val" id="chunk-val">200</span> words
+      </label>
+      <input type="range" id="chunk" min="50" max="500" step="50" value="200" />
+
+      <div class="eval-toggle">
+        <input type="checkbox" id="run-eval" checked />
+        <label for="run-eval">Run quality evaluation</label>
+      </div>
+
+      <button class="run-btn" id="run-btn">
+        <span id="btn-text">Run TokenLens</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="results" class="results-section" style="display:none">
+    <div class="results-header">
+      <h2>Results</h2>
+      <div class="results-sub" id="results-sub"></div>
+    </div>
+    <div class="metrics-row" id="metrics-row"></div>
+    <div class="scores-row" id="scores-row"></div>
+    <div class="answers-row" id="answers-row"></div>
+    <div id="comparison-section"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Token<span class="logo-accent">Lens</span></div>
+    <div class="footer-sub">Built with Ollama · sentence-transformers · FastAPI · No API keys needed</div>
+  </div>
+</footer>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

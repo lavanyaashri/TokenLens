@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How it works · TokenLens</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<nav>
+  <div class="nav-logo">TokenLens</div>
+  <div class="nav-links">
+    <a href="/static/about.html" class="active">How it works</a>
+    <a href="/">Try it</a>
+    <a href="https://github.com" target="_blank">GitHub</a>
+  </div>
+</nav>
+
+<div class="about-hero">
+  <div class="eyebrow">Documentation</div>
+  <h1>What is TokenLens actually doing?</h1>
+  <p>This page breaks down every concept behind TokenLens in plain English. No jargon, no assumptions. If you have ever wondered what a token is, why compression matters, or how a machine measures meaning, this is the page for you.</p>
+</div>
+
+<div class="concept-section">
+
+  <!-- Tokens -->
+  <div class="concept-block">
+    <span class="concept-tag tag-violet">The problem</span>
+    <h2>What is a token, and why does it cost money?</h2>
+    <p>When you send text to an AI model, it does not read words the way you do. It breaks your text into small pieces called tokens. A token is roughly four characters of text. The word "compression" is about three tokens. A full paragraph might be 80 tokens.</p>
+    <p>Every AI company charges per token. The longer your input, the more you pay. At scale, this becomes a serious problem. If a company is processing a million documents a day, shaving 30% off the token count saves an enormous amount of money and makes responses faster.</p>
+
+    <div class="analogy-box">
+      <strong>Think of it like a text message plan.</strong> You pay per character sent. If you could say the same thing in fewer characters without losing meaning, you would always choose to do that. TokenLens figures out how to do exactly that for AI prompts.
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <span class="stat-num">4</span>
+        <div class="stat-label">characters per token on average</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">~55%</span>
+        <div class="stat-label">average token reduction achieved</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">95%</span>
+        <div class="stat-label">meaning preserved after compression</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chunking -->
+  <div class="concept-block">
+    <span class="concept-tag tag-violet">Step one</span>
+    <h2>Chunking: splitting the text into pieces</h2>
+    <p>Before we can compress anything, we need to break the input into manageable pieces. TokenLens splits your text into chunks of around 200 words each.</p>
+    <p>We use overlapping chunks, meaning each chunk shares about 30 words with the chunk before it. This overlap matters because important context often sits right at the boundary between two chunks. Without overlap, we might accidentally cut a sentence in half and lose its meaning.</p>
+
+    <div class="analogy-box">
+      <strong>Think of it like cutting a long ribbon into sections.</strong> Instead of cutting cleanly at every 200 words, you let each section overlap slightly with the next one so the pattern at the edge is never lost.
+    </div>
+
+    <div class="steps-visual">
+      <div class="step-row">
+        <div class="step-dot">1</div>
+        <div class="step-content">
+          <h4>Split by words</h4>
+          <p>The full text is split into a list of individual words.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-dot">2</div>
+        <div class="step-content">
+          <h4>Group into chunks</h4>
+          <p>Words are grouped into chunks of 200, advancing 170 words at a time so 30 words overlap between chunks.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-dot">3</div>
+        <div class="step-content">
+          <h4>Pass chunks to compression</h4>
+          <p>Each chunk is now small enough to embed or summarize individually.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Extractive -->
+  <div class="concept-block">
+    <span class="concept-tag tag-violet">Strategy A</span>
+    <h2>Extractive compression: the highlighter</h2>
+    <p>Extractive compression works like a highlighter. It does not rewrite anything. It reads every chunk, figures out which ones are most relevant to your question, and keeps only those. Everything else gets removed.</p>
+    <p>The key technology here is embeddings. An embedding is a way of converting text into a list of numbers that represents its meaning. Two sentences that mean the same thing will have similar numbers even if they use completely different words. We use a local model called all-MiniLM-L6-v2 to generate these embeddings entirely on your laptop with no internet required.</p>
+
+    <div class="analogy-box">
+      <strong>Think of it like a search engine inside your document.</strong> Your question gets converted into numbers. Every chunk gets converted into numbers. We then measure which chunks are mathematically closest in meaning to your question and keep only those.
+    </div>
+
+    <div class="steps-visual">
+      <div class="step-row">
+        <div class="step-dot">1</div>
+        <div class="step-content">
+          <h4>Embed every chunk</h4>
+          <p>Each chunk is converted into a list of 384 numbers representing its meaning.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-dot">2</div>
+        <div class="step-content">
+          <h4>Embed the question</h4>
+          <p>Your question is also converted into 384 numbers the same way.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-dot">3</div>
+        <div class="step-content">
+          <h4>Measure similarity</h4>
+          <p>We calculate cosine similarity between the question and every chunk. This gives each chunk a relevance score from 0 to 1.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-dot">4</div>
+        <div class="step-content">
+          <h4>Keep the top chunks</h4>
+          <p>The top 50% highest scoring chunks are kept. The rest are discarded. Kept chunks are reassembled in original order so the text still reads naturally.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abstractive -->
+  <div class="concept-block">
+    <span class="concept-tag tag-rose">Strategy B</span>
+    <h2>Abstractive compression: the note taker</h2>
+    <p>Abstractive compression works like a student taking notes. Instead of deciding which chunks to keep or throw away, it reads every single chunk and rewrites it in fewer words. The output is a condensed version of the original written in the model's own words.</p>
+    <p>This is done using a local AI model called Phi-3, which runs entirely on your laptop via Ollama. For each chunk, we send it a prompt that says summarize this concisely, keep all key facts and numbers, remove filler. The model responds with a tighter version and we join all those summaries together.</p>
+
+    <div class="analogy-box">
+      <strong>Think of it like having a very fast research assistant.</strong> You hand them a 10 page document. They read every page and hand you back a 3 page summary that captures everything important, written in clean concise prose.
+    </div>
+
+    <div class="steps-visual">
+      <div class="step-row">
+        <div class="step-dot">1</div>
+        <div class="step-content">
+          <h4>Split into chunks</h4>
+          <p>Same chunking process as extractive, 300 words per chunk with 30 word overlap.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-dot">2</div>
+        <div class="step-content">
+          <h4>Summarize each chunk</h4>
+          <p>Phi-3 reads each chunk and writes a shorter version. This runs locally, no internet needed.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-dot">3</div>
+        <div class="step-content">
+          <h4>Join the summaries</h4>
+          <p>All the mini summaries are joined together into one compressed document.</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;">Abstractive compression is slower than extractive because the model has to read and rewrite every chunk. But it often produces more fluent, coherent output because it is actually understanding and reorganizing the content rather than just selecting pieces of it.</p>
+  </div>
+
+  <!-- ROUGE-L -->
+  <div class="concept-block">
+    <span class="concept-tag tag-mixed">Evaluation</span>
+    <h2>ROUGE-L: measuring word overlap</h2>
+    <p>Once we have compressed the text, we need to know how much quality was lost. The first metric we use is called ROUGE-L. ROUGE stands for Recall-Oriented Understudy for Gisting Evaluation. It was originally developed to evaluate automatic summarization systems.</p>
+    <p>ROUGE-L specifically looks at the longest common subsequence between two pieces of text. A subsequence means words that appear in the same order in both texts, but not necessarily next to each other. A score of 1.0 means the two texts are identical. A score of 0 means they share no words in common order at all.</p>
+
+    <div class="analogy-box">
+      <strong>Think of it like a plagiarism checker running in reverse.</strong> Instead of penalizing you for copying, it rewards you for having the same key words in the same order. A high ROUGE-L score means the compressed answer and the full answer are saying similar things using similar words.
+    </div>
+
+    <p>ROUGE-L has a known weakness though. If you paraphrase perfectly, using completely different words to say the same thing, ROUGE-L will give you a low score even though the answer is just as good. That is why we also use semantic similarity.</p>
+  </div>
+
+  <!-- Semantic similarity -->
+  <div class="concept-block">
+    <span class="concept-tag tag-mixed">Evaluation</span>
+    <h2>Semantic similarity: measuring meaning</h2>
+    <p>Semantic similarity solves ROUGE-L's weakness. Instead of comparing words, it compares meaning. It takes both answers, converts them into embeddings using the same local model we use for extractive compression, and then measures how close those embeddings are to each other using cosine similarity.</p>
+    <p>Cosine similarity measures the angle between two vectors in mathematical space. If two embeddings point in almost exactly the same direction, their cosine similarity is close to 1.0, meaning they represent very similar meanings. If they point in opposite directions, the score is close to 0.</p>
+
+    <div class="analogy-box">
+      <strong>Think of it like two people describing the same movie.</strong> One says "it was thrilling and kept me on the edge of my seat." The other says "it was exciting and suspenseful." ROUGE-L would score this low because the words are different. Semantic similarity would score it high because the meaning is the same.
+    </div>
+
+    <p>In practice, semantic similarity is the more important of the two scores for TokenLens. A compressed answer with 95% semantic similarity but 52% ROUGE-L is still a great result. It means the AI gave essentially the same answer using different words, which is exactly what you want from a good compression.</p>
+  </div>
+
+  <!-- Combined score -->
+  <div class="concept-block">
+    <span class="concept-tag tag-mixed">Evaluation</span>
+    <h2>The combined score</h2>
+    <p>The combined score is the average of ROUGE-L and semantic similarity. It is a single number from 0 to 1 that represents overall answer quality after compression.</p>
+    <p>We weight them equally because each covers what the other misses. ROUGE-L catches cases where the model uses the exact right words. Semantic similarity catches cases where the model paraphrases correctly. Together they give a robust picture of whether the compressed text is actually as useful as the original.</p>
+
+    <div class="analogy-box">
+      <strong>A combined score above 0.7 is a strong result.</strong> It means your compressed text is preserving the majority of the informational value of the original while using significantly fewer tokens. TokenLens regularly achieves combined scores between 0.70 and 0.85 on factual question answering tasks.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">TokenLens</div>
+  <div class="footer-sub">Built with Ollama · sentence-transformers · FastAPI · No API keys needed</div>
+</footer>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
