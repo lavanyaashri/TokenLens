@@ -830,7 +830,147 @@ footer {
   font-weight: 300;
 }
 
+/* ── Tradeoff curve ── */
+.tradeoff-section {
+  margin-top: 2rem;
+  background: rgba(255,255,255,0.02);
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+.tradeoff-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tradeoff-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.tradeoff-sub {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+.tradeoff-btn {
+  background: var(--grad);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.tradeoff-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.tradeoff-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+#tradeoff-canvas {
+  width: 100%;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 0.5px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.tradeoff-finding {
+  background: var(--grad-soft);
+  border: 0.5px solid rgba(124,58,237,0.2);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+}
+.tradeoff-finding strong { color: #fff; font-weight: 600; }
+
+.tradeoff-table-wrap { overflow-x: auto; }
+
+.tradeoff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.tradeoff-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.tradeoff-table td {
+  padding: 10px 12px;
+  color: rgba(255,255,255,0.6);
+  border-bottom: 0.5px solid var(--border);
+  font-weight: 300;
+}
+
+.tradeoff-table tr:last-child td { border-bottom: none; }
+.tradeoff-table .best-row td { color: #fff; }
+
+.cliff-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(219,39,119,0.15);
+  color: var(--rose-light);
+  border: 0.5px solid rgba(244,114,182,0.2);
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+.good-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(124,58,237,0.15);
+  color: var(--violet-light);
+  border: 0.5px solid rgba(167,139,250,0.2);
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.4); }
+
+/* ── Fix clickability ── */
+.results-section {
+  position: relative;
+  z-index: 2;
+}
+
+.tradeoff-section {
+  position: relative;
+  z-index: 2;
+}
+
+.tradeoff-btn {
+  position: relative;
+  z-index: 3;
+  pointer-events: all;
+}

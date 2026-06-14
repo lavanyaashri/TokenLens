@@ -112,3 +112,46 @@ async def upload_file(file: UploadFile = File(...)):
     else:
         text = content.decode("utf-8", errors="ignore")
         return {"text": text, "words": len(text.split())}
+    
+
+@app.post("/api/tradeoff")
+async def tradeoff_curve(
+    text: str = Form(...),
+    question: str = Form(...),
+    qa_model: str = Form("llama3.2"),
+):
+    """
+    Run extractive compression at every ratio from 0.1 to 0.9
+    and return quality scores at each level.
+    This generates the quality vs compression tradeoff curve.
+    """
+    ratios = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    results = []
+
+    for ratio in ratios:
+        # Compress at this ratio
+        compressed = extractive_compress(
+            text,
+            query=question,
+            compression_ratio=ratio,
+        )
+
+        # Evaluate quality
+        eval_result = run_full_eval(
+            original_text=text,
+            compressed_text=compressed["compressed_text"],
+            question=question,
+            model=qa_model,
+        )
+
+        results.append({
+            "ratio": ratio,
+            "compression_pct": compressed["stats"]["compression_pct"],
+            "tokens_saved": compressed["stats"]["tokens_saved"],
+            "compressed_tokens": compressed["stats"]["compressed_tokens"],
+            "semantic_similarity": eval_result["semantic_similarity"],
+            "rouge_l": eval_result["rouge_l"],
+            "combined_score": eval_result["combined_score"],
+        })
+
+    return {"curve": results}
