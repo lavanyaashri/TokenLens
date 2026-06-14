@@ -179,6 +179,13 @@ The quality tradeoff curve is a genuinely original research contribution — it 
 
 ---
 
+## Published Dataset
+
+Benchmark results across 100 Wikipedia articles published on HuggingFace.
+
+[tokenlens-compression-benchmark](https://huggingface.co/datasets/lavanyaashri/tokenlens-compression-benchmark) — 900 rows measuring compression quality across 5 document categories.
+
+
 ## Built By
 
 **Lavanya Ashri** — Junior, Computer Science
