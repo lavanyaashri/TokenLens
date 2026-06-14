@@ -24,7 +24,7 @@ SUMMARY:"""
 
 def abstractive_compress(
     text: str,
-    model: str = "phi3",
+    model: str = "llama3.2:1b",
     chunk_size: int = 300,
     overlap: int = 30,
     on_progress=None,
